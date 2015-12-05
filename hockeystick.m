@@ -5,7 +5,6 @@
 % clear memory
 clear
 
-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Read-in Data
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,7 +16,8 @@ M = dlmread('lambh23b.txt','\t');
 % parse
 x = M(:,1);
 y = M(:,2);
-N = length(y);
+N = length(y);                      % # of samples
+dt = (max(x) - min(x)) / (N-1);     % time step
 % plot
 figure(1)
 subplot(2,1,1), plot(x,y);
@@ -56,9 +56,9 @@ fprintf('Butterworth Bandpass Filtering\n')
 %n   = input('Please enter n-1 filter order: ');
 %fp1 = input('Please enter low-end frequency: ');
 %fp2 = input('Please enter high-end frequency: ');
-n=1; fp1=0; fp2=11;
+n=1; fp1=0; fp2=40;
 fprintf('\n')
-fprintf('\nThe BW Selected is f_lo = %f and f_hi = %f\n', fp1, fp2)
+fprintf('The BW Selected is f_lo = %f and f_hi = %f\n', fp1, fp2)
 fo = fp1 + (fp2-fp1)/2;
 fprintf('Thus, fo for the filter is %f\n\n', fo)
         
@@ -71,8 +71,9 @@ q = wo/bw;          %quality factor
 
 %h_f = (1 + (((j.*w)./wo).^2)) ./ (1 + ((j.*w)./(q*wo)) + (((j.*w)./wo).^2));
 h_f = (1./(1+(w./wo).^(2*n))) .* (1./(1+(wo./w).^(2*n)));     % lpf * hpf
-Y_f = (Y) .* abs(h_f');
-Fs=N;
+Y_f = (Y) .* abs(h_f');     % noisy signal * filter function
+
+Fs = N/dt;
 Y_t = Fs * real(ifft(ifftshift(Y_f)));
 
 figure(4)
